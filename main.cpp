@@ -6,6 +6,24 @@
 #include <QLabel>
 #include <QFont>
 #include <QPropertyAnimation>
+#include <QStackedWidget>
+
+class LoginPage : public QWidget {
+public:
+    LoginPage(QWidget* parent = nullptr) : QWidget(parent) {
+        QVBoxLayout* layout = new QVBoxLayout(this);
+
+
+
+        QLabel* loginLabel = new QLabel("Create an Account", this);
+        QFont titleFont("Times New Roman", 24, QFont::Bold, true);
+        loginLabel->setFont(titleFont);
+        loginLabel->setAlignment(Qt::AlignCenter);
+        layout->addWidget(loginLabel);
+
+    }
+};
+
 
 class NavBar : public QWidget {
 public:
@@ -56,8 +74,11 @@ public:
 };
 
 class MainPage : public QWidget {
+    QStackedWidget* stackedWidget;
+
+
 public:
-    MainPage(QWidget* parent = nullptr) : QWidget(parent) {
+    MainPage(QStackedWidget* stackedWidget, QWidget* parent = nullptr) : QWidget(parent), stackedWidget(stackedWidget) {
         // Background settings for the main page with a smooth radial gradient
         this->setStyleSheet("background: qradialgradient(cx:0.5, cy:0.5, radius: 1.0, "
             "fx:0.5, fy:0.5, stop:0 rgba(173, 255, 179, 255), stop:1 rgba(200, 255, 200, 0));");
@@ -79,6 +100,11 @@ public:
         loginButton->setStyleSheet("background-color: #BDFF8B; color: black; padding: 10px 20px; border-radius: 5px;");
         loginButton->setCursor(Qt::PointingHandCursor); // Change cursor to pointer on hover
 
+        // Connect -> след натискане на бутоона да ни прехвърли към LoginPage
+
+        connect(loginButton, &QPushButton::clicked, this, &MainPage::onLoginButtonClicked);
+
+
         // Adding elements to the main layout
         mainLayout->addStretch(); // Add stretchable space above the label
         mainLayout->addWidget(welcomeLabel, 0, Qt::AlignCenter); // Center the welcome label
@@ -91,6 +117,11 @@ public:
         animation->setStartValue(0.0); // Start with opacity 0
         animation->setEndValue(1.0); // End with full opacity
         animation->start(); // Start the animation
+    }
+
+private slots:
+    void onLoginButtonClicked() {
+        stackedWidget->setCurrentIndex(1);
     }
 };
 
@@ -106,9 +137,20 @@ int main(int argc, char* argv[]) {
     NavBar* navBar = new NavBar();
     windowLayout->addWidget(navBar);
 
+
+private slots:
+    void onLoginButtonClicked() {
+        stackedWidget->setCurrentIndex(1);
+    }
+};
+
+
     // Main page
-    MainPage* mainPage = new MainPage();
-    windowLayout->addWidget(mainPage);
+MainPage* mainPage = new MainPage(stackedWidget);
+LoginPage* loginPage = new LoginPage();
+
+stackedWidget->addWidget(mainPage);
+stackedWidget->addWidget(loginPage);
 
     // Window settings
     window.setWindowTitle("SpendTrack - Elegant Navigation Bar Example");

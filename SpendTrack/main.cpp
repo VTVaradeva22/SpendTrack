@@ -6,6 +6,31 @@
 #include <QLabel>
 #include <QFont>
 #include <QPropertyAnimation>
+#include <QStackedWidget>
+
+
+
+class LoginPage : public QWidget{
+public:
+    LoginPage(QWidget *parent = nullptr) : QWidget(parent){
+        QVBoxLayout *layout = new QVBoxLayout(this);
+
+
+
+        QLabel *loginLabel = new QLabel("Create an Account",this);
+        QFont titleFont("Times New Roman",24,QFont::Bold,true);
+        loginLabel->setFont(titleFont);
+        loginLabel->setAlignment(Qt::AlignCenter);
+        layout->addWidget(loginLabel);
+
+    }
+};
+
+
+
+
+
+
 
 class NavBar : public QWidget {
 public:
@@ -55,8 +80,12 @@ public:
 };
 
 class MainPage : public QWidget {
+    QStackedWidget *stackedWidget;
+
+
 public:
-    MainPage(QWidget *parent = nullptr) : QWidget(parent) {
+
+    MainPage(QStackedWidget *stackedWidget, QWidget *parent = nullptr) : QWidget(parent), stackedWidget(stackedWidget) {
         // Настройки на фона за основната страница с плавен преливащ градиент
         this->setStyleSheet("background: qradialgradient(cx:0.5, cy:0.5, radius: 1.0, "
                             "fx:0.5, fy:0.5, stop:0 rgba(173, 255, 179, 255), stop:1 rgba(200, 255, 200, 0));");
@@ -78,6 +107,10 @@ public:
         loginButton->setStyleSheet("background-color: #BDFF8B; color: black; padding: 10px 20px; border-radius: 5px;");
         loginButton->setCursor(Qt::PointingHandCursor);
 
+        // Connect -> след натискане на бутоона да ни прехвърли към LoginPage
+
+        connect(loginButton,&QPushButton::clicked,this,&MainPage::onLoginButtonClicked);
+
         // Добавяне на елементи
         mainLayout->addStretch();
         mainLayout->addWidget(welcomeLabel, 0, Qt::AlignCenter);
@@ -90,6 +123,11 @@ public:
         animation->setStartValue(0.0);
         animation->setEndValue(1.0);
         animation->start();
+    }
+
+private slots:
+    void onLoginButtonClicked(){
+        stackedWidget->setCurrentIndex(1);
     }
 };
 
@@ -105,9 +143,22 @@ int main(int argc, char *argv[]) {
     NavBar *navBar = new NavBar();
     windowLayout->addWidget(navBar);
 
+
+private slots:
+    void onLoginButtonClicked(){
+        stackedWidget->setCurrentIndex(1);
+    }
+};
+
+
     // Основна страница
-    MainPage *mainPage = new MainPage();
-    windowLayout->addWidget(mainPage);
+    MainPage *mainPage = new MainPage(stackedWidget);
+    LoginPage *loginPage = new LoginPage();
+
+
+    stackedWidget->addWidget(mainPage);
+    stackedWidget->addWidget(loginPage);
+
 
     // Настройки на прозореца
     window.setWindowTitle("SpendTrack - Elegant Navigation Bar Example");
