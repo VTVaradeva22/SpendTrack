@@ -7,6 +7,9 @@
 #include <QFont>
 #include <QPropertyAnimation>
 #include <QStackedWidget>
+#include <QFormLayout>
+#include <QLineEdit>
+
 
 class LoginPage : public QWidget {
 public:
@@ -14,12 +17,58 @@ public:
         QVBoxLayout* layout = new QVBoxLayout(this);
 
 
-
+        // Title Label
         QLabel* loginLabel = new QLabel("Create an Account", this);
         QFont titleFont("Times New Roman", 24, QFont::Bold, true);
         loginLabel->setFont(titleFont);
         loginLabel->setAlignment(Qt::AlignCenter);
         layout->addWidget(loginLabel);
+
+        // Form layout
+        QFormLayout* formLayout = new QFormLayout();
+
+        // First and last name input fields
+        QHBoxLayout* nameLayout = new QHBoxLayout();
+        QLineEdit* firstNameInput = new QLineEdit(this);
+        QLineEdit* lastNameInput = new QLineEdit(this);
+        firstNameInput->setPlaceholderText("First name");
+        lastNameInput->setPlaceholderText("Last name");
+        nameLayout->addWidget(firstNameInput);
+        nameLayout->addWidget(lastNameInput);
+        formLayout->addRow(nameLayout);
+
+        // Email input field
+        QLineEdit* emailInput = new QLineEdit(this);
+        emailInput->setPlaceholderText("Email");
+        formLayout->addRow(emailInput);
+
+        //Password input field
+
+        QLineEdit* passwordInput = new QLineEdit(this);
+        passwordInput->setPlaceholderText("Enter your password");
+        passwordInput->setEchoMode(QLineEdit::Password);
+        formLayout->addRow(passwordInput);
+
+        // Adsd form to main layout
+        layout->addLayout(formLayout);
+
+        // Create account button
+
+        QPushButton* createAccountButton = new QPushButton("Create account");
+        createAccountButton->setStyleSheet("background-color: green");
+        layout->addWidget(createAccountButton,0,Qt::AlignCenter);
+
+        // Link to log in page
+
+        QLabel* loginLink = new QLabel("<a href='#'>Already have an account? Log In</a> ");
+        loginLink->setStyleSheet("color: black;");
+        loginLink->setAlignment(Qt::AlignCenter);
+        loginLink->setTextFormat(Qt::RichText);
+        loginLink->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        loginLink->setOpenExternalLinks(true);
+        layout->addWidget(loginLink);
+
+        layout->setAlignment(Qt::AlignCenter);
 
     }
 };
@@ -100,7 +149,7 @@ public:
         loginButton->setStyleSheet("background-color: #BDFF8B; color: black; padding: 10px 20px; border-radius: 5px;");
         loginButton->setCursor(Qt::PointingHandCursor); // Change cursor to pointer on hover
 
-        // Connect -> след натискане на бутоона да ни прехвърли към LoginPage
+        // Connect -> ???? ????????? ?? ??????? ?? ?? ????????? ??? LoginPage
 
         connect(loginButton, &QPushButton::clicked, this, &MainPage::onLoginButtonClicked);
 
@@ -138,19 +187,14 @@ int main(int argc, char* argv[]) {
     windowLayout->addWidget(navBar);
 
 
-private slots:
-    void onLoginButtonClicked() {
-        stackedWidget->setCurrentIndex(1);
-    }
-};
-
-
+    QStackedWidget* stackedWidget = new QStackedWidget;
+    windowLayout->addWidget(stackedWidget);
     // Main page
-MainPage* mainPage = new MainPage(stackedWidget);
-LoginPage* loginPage = new LoginPage();
+    MainPage* mainPage = new MainPage(stackedWidget);
+    LoginPage* loginPage = new LoginPage();
 
-stackedWidget->addWidget(mainPage);
-stackedWidget->addWidget(loginPage);
+    stackedWidget->addWidget(mainPage);
+    stackedWidget->addWidget(loginPage);
 
     // Window settings
     window.setWindowTitle("SpendTrack - Elegant Navigation Bar Example");
