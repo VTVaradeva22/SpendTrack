@@ -33,7 +33,7 @@ SpendTrack is your go-to C++ financial tracker, letting you easily manage expens
   </p> 
   
 ## 💼 Documents
-+ [Presentation]()
++ [Presentation](./Prresentation/SpendTrack.pptx)
 + [Documentation]()
 
 
