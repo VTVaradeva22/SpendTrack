@@ -24,23 +24,105 @@ public:
         mainLayout->addWidget(titleLabel);
     }
 };
-
 class ExpensesPage : public QWidget {
 public:
     ExpensesPage(QWidget* parent = nullptr) : QWidget(parent) {
-        // Set the background style to match other pages
         this->setStyleSheet("background: qradialgradient(cx:0.5, cy:0.5, radius: 1.0, "
                             "fx:0.5, fy:0.5, stop:0 rgba(173, 255, 179, 255), stop:1 rgba(200, 255, 200, 0));");
 
         QVBoxLayout* mainLayout = new QVBoxLayout(this);
 
-        // Title label for the Expenses page
         QLabel* titleLabel = new QLabel("Expenses", this);
         titleLabel->setStyleSheet("font-family: 'Times New Roman'; font-size: 24px; font-weight: bold; color: black;");
         titleLabel->setAlignment(Qt::AlignCenter);
         mainLayout->addWidget(titleLabel);
 
+        QFormLayout* formLayout = new QFormLayout;
+
+        dateInput = new QLineEdit(this);
+        categoryInput = new QLineEdit(this);
+        amountInput = new QLineEdit(this);
+
+        dateInput->setPlaceholderText("Enter date (e.g., 2023-11-01)");
+        categoryInput->setPlaceholderText("Enter category (e.g., Food)");
+        amountInput->setPlaceholderText("Enter amount (e.g., 200)");
+
+        dateInput->setStyleSheet("font-family: 'Times New Roman'; font-size: 18px;");
+        categoryInput->setStyleSheet("font-family: 'Times New Roman'; font-size: 18px;");
+        amountInput->setStyleSheet("font-family: 'Times New Roman'; font-size: 18px;");
+
+        formLayout->addRow("Date:", dateInput);
+        formLayout->addRow("Category:", categoryInput);
+        formLayout->addRow("Amount:", amountInput);
+
+        mainLayout->addLayout(formLayout);
+
+        QPushButton* addButton = new QPushButton("Add Expense", this);
+        addButton->setStyleSheet("background-color: red; color: white; font-family: 'Times New Roman'; font-weight: bold;");
+        mainLayout->addWidget(addButton);
+
+        connect(addButton, &QPushButton::clicked, this, &ExpensesPage::addExpense);
+
+        expensesLayout = new QVBoxLayout();
+        mainLayout->addLayout(expensesLayout);
+
+        totalLabel = new QLabel("Total Expenses: 0", this);
+        totalLabel->setStyleSheet("font-family: 'Times New Roman'; font-size: 18px; font-weight: bold; color: black;");
+        mainLayout->addWidget(totalLabel);
+
+        chartLabel = new QLabel(this);
+        mainLayout->addWidget(chartLabel);
+
+        updateChart();
     }
+
+private slots:
+    void addExpense() {
+        QString date = dateInput->text();
+        QString category = categoryInput->text();
+        QString amount = amountInput->text();
+
+        bool ok;
+        double amountValue = amount.toDouble(&ok);
+        if (date.isEmpty() || category.isEmpty() || amount.isEmpty() || !ok || amountValue <= 0) {
+            return;
+        }
+
+        QHBoxLayout* expenseLayout = new QHBoxLayout();
+        expenseLayout->addWidget(new QLabel(date, this));
+        expenseLayout->addWidget(new QLabel(category, this));
+        expenseLayout->addWidget(new QLabel(amount, this));
+
+        expensesLayout->addLayout(expenseLayout);
+
+        dateInput->clear();
+        categoryInput->clear();
+        amountInput->clear();
+
+        totalExpenses += amountValue;
+        expenseData[category] += amountValue;
+
+        totalLabel->setText("Total Expenses: " + QString::number(totalExpenses));
+        updateChart();
+    }
+
+    void updateChart() {
+        QString chartText = "Expenses Distribution:\n";
+        for (auto it = expenseData.begin(); it != expenseData.end(); ++it) {
+            chartText += QString("%1: %2%\n").arg(it.key()).arg((it.value() / totalExpenses) * 100, 0, 'f', 2);
+        }
+        chartLabel->setText(chartText);
+    }
+
+private:
+    QVBoxLayout* expensesLayout;
+    QLineEdit* dateInput;
+    QLineEdit* categoryInput;
+    QLineEdit* amountInput;
+    QLabel* totalLabel;
+    QLabel* chartLabel;
+    double totalExpenses = 0;
+    QMap<QString, double> expenseData;
 };
 class IncomesPage : public QWidget {
 public:
